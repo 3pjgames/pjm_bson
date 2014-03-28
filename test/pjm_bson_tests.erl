@@ -28,4 +28,4 @@ to_bson_nest_test() ->
           {login, <<"ian">>, age, 30, embed, {login, "yincan"}},
           ?MODULE
          ),
-    ?assertEqual({login, <<"ian">>, age, 30, embed, {login, "yincan"}}, pjm_bson:to_bson(M)).
+    ?assertEqual({age, 30, embed, {login, <<"yincan">>}, login, <<"ian">>}, pjm_bson:to_bson(M)).

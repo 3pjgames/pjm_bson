@@ -3,10 +3,19 @@
 -export([from_bson/2, to_bson/1, coerce/2]).
 
 -spec from_bson(bson:document(), module() | pjm:model()) -> pjm:model().
-from_bson({Object}, Module) when is_atom(Module) ->
-    from_bson({Object}, Module:new());
-from_bson({Object}, Model) ->
-    pjm:set(Object, Model).
+from_bson(Bson, Module) when is_atom(Module) ->
+    from_bson(Bson, Module:new());
+from_bson(Bson, Model) ->
+    {Attrs} = bson_to_term(Bson),
+    pjm:set(Attrs, Model).
+
+bson_to_term(Document) when is_tuple(Document) andalso size(Document) rem 2 =:= 0 ->
+    {lists:map(fun({K, V}) -> {K, bson_to_term(V)} end, bson:fields(Document))};
+bson_to_term(Tuple) when is_tuple(Tuple)->
+    Tuple;
+bson_to_term(List) when is_list(List) ->
+    lists:map(fun bson_to_term/1, List);
+bson_to_term(Term) -> Term.
 
 -spec to_bson(pjm:model()) -> bson:document().
 to_bson(Model) ->
