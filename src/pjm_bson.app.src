@@ -1,0 +1,12 @@
+{application, pjm_bson,
+ [
+  {description, "PJ Model convert to/from bson document."},
+  {vsn, git},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib,
+                  pjm
+                 ]},
+  {env, []}
+ ]}.
