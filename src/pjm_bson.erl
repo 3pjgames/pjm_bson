@@ -32,7 +32,7 @@ to_bson_acc(_K, undefined, List) ->
 to_bson_acc(K, Value, List) ->
     [{K, term_to_bson(Value)}|List].
 
-term_to_bson({pjm, _, _, _} = Model) ->
+term_to_bson({pjm, _, _} = Model) ->
     to_bson(Model);
 term_to_bson([]) -> [];
 term_to_bson({}) -> {};
