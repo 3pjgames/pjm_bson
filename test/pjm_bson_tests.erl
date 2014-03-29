@@ -3,11 +3,10 @@
 
 -include("./test_helpers.hrl").
 
--pjm_stores_in(users).
--pjm_fields([
-             {login, binary, <<"test">>},
-             {embed, pjm_bson_tests}
-            ]).
+-pjm({fields, [
+               {login, binary, <<"test">>},
+               {embed, pjm_bson_tests}
+              ]}).
 
 from_bson_test() ->
     M = pjm_bson:from_bson(
