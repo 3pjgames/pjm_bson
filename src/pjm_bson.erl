@@ -51,5 +51,5 @@ term_to_bson(Term) -> Term.
 coerce(objectid, {<<_:96>>} = Id) -> Id;
 coerce(objectid, Id) when is_binary(Id) ->
     % From Hex String to Binary
-    << << (binary_to_integer(Bits, 16)):4 >> || << Bits:1/binary >> <= Id >>;
+    {<< << (binary_to_integer(Bits, 16)):4 >> || << Bits:1/binary >> <= Id >>};
 coerce(objectid, {pjm, Module, _} = Model) -> Module:get('_id', Model).
