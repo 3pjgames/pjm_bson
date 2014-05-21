@@ -48,6 +48,7 @@ term_to_bson({List}) when is_list(List) ->
 term_to_bson(Term) -> Term.
 
 %% use {pjm_bson, objectid} as pjm field type.
+coerce(objectid, undefined) -> undefined;
 coerce(objectid, {<<_:96>>} = Id) -> Id;
 coerce(objectid, Id) when is_binary(Id) ->
     % From Hex String to Binary
