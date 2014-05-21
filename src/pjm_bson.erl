@@ -39,6 +39,7 @@ term_to_bson({pjm, _, _} = Model) ->
     to_bson(Model);
 term_to_bson([]) -> [];
 term_to_bson({}) -> {};
+term_to_bson({[]}) -> {};
 term_to_bson([{Key, _Value}|_Rest] = List) when is_atom(Key) orelse is_binary(Key) ->
     bson:document(lists:map(fun({K, V}) -> {K, term_to_bson(V)} end, List));
 term_to_bson(List) when is_list(List) ->
