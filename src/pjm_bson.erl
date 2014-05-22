@@ -40,12 +40,14 @@ term_to_bson({pjm, _, _} = Model) ->
 term_to_bson([]) -> [];
 term_to_bson({}) -> {};
 term_to_bson({[]}) -> {};
-term_to_bson([{Key, _Value}|_Rest] = List) when is_atom(Key) orelse is_binary(Key) ->
-    bson:document(lists:map(fun({K, V}) -> {K, term_to_bson(V)} end, List));
+term_to_bson([{_Key, _Value}|_Rest] = List) ->
+    bson:document(lists:map(fun({K, V}) -> {term_to_bson_key(K), term_to_bson(V)} end, List));
 term_to_bson(List) when is_list(List) ->
     lists:map(fun term_to_bson/1, List);
 term_to_bson({List}) when is_list(List) ->
     term_to_bson(List);
+term_to_bson(Dict) when is_tuple(Dict) andalso element(1, Dict) =:= dict ->
+    term_to_bson(dict:to_list(Dict));
 term_to_bson(Term) -> Term.
 
 %% use {pjm_bson, objectid} as pjm field type.
@@ -55,3 +57,6 @@ coerce(objectid, Id) when is_binary(Id) ->
     % From Hex String to Binary
     {<< << (binary_to_integer(Bits, 16)):4 >> || << Bits:1/binary >> <= Id >>};
 coerce(objectid, {pjm, Module, _} = Model) -> Module:get('_id', Model).
+
+term_to_bson_key(Key) when is_binary(Key) orelse is_atom(Key) -> Key;
+term_to_bson_key(Key) when is_integer(Key) -> integer_to_binary(Key).
