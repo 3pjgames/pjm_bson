@@ -53,13 +53,16 @@ term_to_bson(Term) -> Term.
 %% use {pjm_bson, objectid} as pjm field type.
 coerce(objectid, undefined) -> undefined;
 coerce(objectid, {<<_:96>>} = Id) -> Id;
-coerce(objectid, Id) when is_binary(Id) ->
+coerce(objectid, Id) when is_binary(Id) orelse is_atom(Id) ->
+    IdBin = if is_atom(Id) -> atom_to_binary(Id, utf8);
+               true -> Id
+            end,
     % From Hex String to Binary
-    {<< << (binary_to_integer(Bits, 16)):4 >> || << Bits:1/binary >> <= Id >>};
+    {<< << (binary_to_integer(Bits, 16)):4 >> || << Bits:1/binary >> <= IdBin >>};
 coerce(objectid, {pjm, Module, _} = Model) -> Module:get('_id', Model).
 
 term_to_bson_key(Key) when is_binary(Key) orelse is_atom(Key) -> Key;
+term_to_bson_key(Key) when is_integer(Key) -> integer_to_binary(Key);
 term_to_bson_key({<<_:96>> = Key}) ->
     %% convert object id to hex string
-    << << (integer_to_binary(Bits, 16))/binary >> || << Bits:4 >> <= Key >>;
-term_to_bson_key(Key) when is_integer(Key) -> integer_to_binary(Key).
+    << << (integer_to_binary(Bits, 16))/binary >> || << Bits:4 >> <= Key >>.
