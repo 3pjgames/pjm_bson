@@ -29,8 +29,11 @@ to_bson_nest_test() ->
          ),
     ?assertEqual({age, 30, embed, {login, <<"yincan">>}, login, <<"ian">>}, pjm_bson:to_bson(M)).
 
-dict_to_bson_test() ->
+dict_to_bson_test_() ->
     Dict = dict:from_list([{login, <<"ian">>}, {age, 30}]),
     Bson = pjm_bson:term_to_bson(Dict),
 
-    ?assertEqual({age, 30, login, <<"ian">>}, Bson).
+    [
+     ?_assertEqual({age, 30, login, <<"ian">>}, Bson),
+     ?_assertEqual({}, pjm_bson:term_to_bson(dict:new()))
+    ].

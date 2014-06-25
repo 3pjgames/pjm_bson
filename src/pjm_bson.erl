@@ -47,7 +47,10 @@ term_to_bson(List) when is_list(List) ->
 term_to_bson({List}) when is_list(List) ->
     term_to_bson(List);
 term_to_bson(Dict) when is_tuple(Dict) andalso element(1, Dict) =:= dict ->
-    term_to_bson(dict:to_list(Dict));
+    case dict:size(Dict) of
+        0 -> {};
+        _ -> term_to_bson(dict:to_list(Dict))
+    end;
 term_to_bson(Term) -> Term.
 
 %% use {pjm_bson, objectid} as pjm field type.
@@ -65,4 +68,9 @@ term_to_bson_key(Key) when is_binary(Key) orelse is_atom(Key) -> Key;
 term_to_bson_key(Key) when is_integer(Key) -> integer_to_binary(Key);
 term_to_bson_key({<<_:96>> = Key}) ->
     %% convert object id to hex string
-    << << (integer_to_binary(Bits, 16))/binary >> || << Bits:4 >> <= Key >>.
+    << << (encode_hex_bit(Bits))/binary >> || << Bits:4 >> <= Key >>.
+
+encode_hex_bit(Bit) when Bit < 10 ->
+    integer_to_binary(Bit);
+encode_hex_bit(Bit) ->
+    << (Bit - 10 + 97) >>.
